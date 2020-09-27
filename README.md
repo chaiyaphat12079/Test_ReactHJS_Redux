@@ -1,2 +1,3 @@
 # Test_ReactHJS_Redux
-Tes
+How to run
+npm i && npm start
