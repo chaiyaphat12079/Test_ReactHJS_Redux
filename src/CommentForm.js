@@ -26,6 +26,7 @@ class CommentForm extends Component{
             firstName: "",
             lastName:"",
             startDat: new Date(),
+            isSelectDate:false,
             nationalitySelect: "",
             nationality: [
                 { value: 'Afghan', label: 'Afghan'},
@@ -53,8 +54,12 @@ class CommentForm extends Component{
             numberPhone:'',
             preFixPhone:'',
             passport:'',
-            salary:0,
-            gender:''
+            salary:'',
+            gender:'',
+            fistNameCheck:false,
+            lastNameCheck:false,
+            salaryCheck:false,
+
         }
         this.id2 = React.createRef()
         this.id3 = React.createRef()
@@ -70,7 +75,8 @@ class CommentForm extends Component{
 
     handleChange = date => {
         this.setState({
-            startDate: date
+            startDate: date,
+            isSelectDate:true
         });
         console.log(date);
     };
@@ -144,28 +150,54 @@ class CommentForm extends Component{
     passportHandle(e){
         this.setState({passport:e})
     }
-    
     handleSubmit = (e) =>{
-        e.preventDefault()  //ไม่ต้องรีหน้า
         //Object
-        const data = {
-            id: new Date(),
-            firstName:this.state.firstName,
-            lastName:this.state.lastName,
-            gender:this.state.gender,
-            editing:false,
-            mobilePhone:this.state.numberPhone,
-            preFixPhone:this.state.phoneSelect,
-            nationality:this.state.nationalitySelect.value
-
+        const re = /^[a-zA-Z ]{2,30}$/
+        if(re.test(this.state.firstName)){
+            this.setState({fistNameCheck:true})    
+        }else{
+            alert("ชื่อต้องมีมากกว่า 2 อักษรขึ้นไป และ ไม่มีตัวเลขปน")
         }
-        this.props.dispatch({
-            type:"ADD_COMMENT",
-            data
-        })
-        // this.getMessage.value = ""
-        // this.getName.value = ""
-        console.log(data);
+
+        if(re.test(this.state.lastName)){
+            this.setState({lastNameCheck:true})                
+        }else{
+            alert("นามสกุลต้องมีมากกว่า 2 อักษรขึ้นไป และ ไม่มีตัวเลขปน")
+        }
+
+        if(parseInt(this.state.salary)>0){
+            this.setState({salaryCheck:true})
+        }else{
+            alert("เงินเดือนต้องมากกว่า 0 ")
+        }
+
+        if(this.state.gender !=='' && this.state.firstName !=='' && this.state.lastName !=="" && this.state.numberPhone !=='' && this.state.salary !==0){
+            
+ 
+            if(this.state.fistNameCheck && this.state.lastNameCheck && this.state.salaryCheck){
+                const data = {
+                    id: new Date(),
+                    firstName:this.state.firstName,
+                    lastName:this.state.lastName,
+                    gender:this.state.gender,
+                    editing:false,
+                    mobilePhone:this.state.numberPhone,
+                    preFixPhone:this.state.phoneSelect,
+                    nationality:this.state.nationalitySelect.value
+        
+                }
+                this.props.dispatch({
+                    type:"ADD_COMMENT",
+                    data
+                })
+            }else{
+                alert(" กรุณากรอกข้อมูลให้ถูกต้องตามรูปแบบ")
+            }
+
+        }else{
+            alert("กรุณากรอกข้อมูลให้ครบ")
+        }
+        
     }
     deleteAll(){
         const data = {
@@ -184,6 +216,15 @@ class CommentForm extends Component{
             data
         })
     }
+    handleFirstName(value){
+        // const re = /^[a-zA-Z ]{2,30}$/
+        // if(re.test(value)){
+        //     this.setState({firstName:value.target.value})
+        // }else if(value.length ===0){
+        //     this.setState({firstName:value.target.value})
+        // }
+        this.setState({firstName:value.target.value})
+    }
     render(){
         return (
             <div style={{display:'flex',padding:20,flexDirection:'column',paddingRight:50,paddingLeft:50,alignItems:'center',}}>
@@ -192,7 +233,13 @@ class CommentForm extends Component{
                     {/* row 1  */}
                     <div style={{display:'flex',flexDirection:'row'}}>
                         <h3>Title : </h3>
+                        {this.state.titleSelect ===''? (
+                                <h3 style={{marginLeft:5,color:'red'}}>*</h3>
+                            ):( 
+                                null
+                            )}
                         <div style={{width:120,height:40,marginTop:10,marginLeft:10,marginRight:10}}>
+
                             <Select
                                 name="form-field-name"
                                 value={this.state.titleSelect}
@@ -207,14 +254,24 @@ class CommentForm extends Component{
                         {/* show first name */}
                         <div style={{width:50}}/>
                         <h3>FirstName : </h3>
+                        {this.state.firstName ===''? (
+                                <h3 style={{marginLeft:5,color:'red'}}>*</h3>
+                            ):( 
+                                null
+                            )}
                         <div style={{width:20}}/>
                         <form style={{marginTop:20}}>
-                            <input type="text"  name="name"  onChange={(value)=>{this.setState({firstName:value.target.value})}} value={this.state.firstName} />
+                            <input type="text"  name="name"  onChange={(value)=>{this.handleFirstName(value)}} value={this.state.firstName} />
                         </form>
 
                         {/* show last name */}
                         <div style={{width:50}}/>
                         <h3>LastName : </h3>
+                        {this.state.lastName ===''? (
+                                <h3 style={{marginLeft:5,color:'red'}}>*</h3>
+                            ):( 
+                                null
+                            )}
                         <div style={{width:20}}/>
                         <form style={{marginTop:20}}>
                             <input type="text" name="name" onChange={(value)=>{this.setState({lastName:value.target.value})}} value={this.state.lastName}/>
@@ -225,6 +282,11 @@ class CommentForm extends Component{
                     
                     <div style={{marginTop:20,flexDirection:'row',display:'flex'}}>
                         <h3>Birthday : </h3>
+                        {this.state.isSelectDate ? (
+                                null
+                            ):( 
+                                <h3 style={{marginLeft:5,color:'red'}}>*</h3>
+                            )}
                         <div style={{marginTop:20,marginLeft:20}}>
                             <DatePicker
                                 iconClassName='calendar icon'
@@ -310,6 +372,11 @@ class CommentForm extends Component{
 
                     <div style={{flexDirection:'row',display:'flex'}}>
                         <h3>Mobile Phone : </h3>
+                        {this.state.phoneSelect !== '' && this.state.numberPhone !== '' ? (
+                                null
+                            ):( 
+                                <h3 style={{marginLeft:5,color:'red'}}>*</h3>
+                            )}
                         <div style={{width:100,marginTop:15,marginLeft:20}}>
                         <Select
                             name="form-field-name"
@@ -335,6 +402,11 @@ class CommentForm extends Component{
 
                     <div  style={{flexDirection:'row',display:'flex'}}>
                         <h3>Expect Salary : </h3>
+                        {this.state.salary === '' ? (
+                                <h3 style={{marginLeft:5,color:'red'}}>*</h3>
+                            ):( 
+                                null
+                            )}
                         <div style={{width:100,marginTop:20,marginLeft:20}}>
                             <input type="text" maxLength={9} value={this.state.salary} onChange={(e)=>this.salaryHandle(e.target.value)}></input>
                         </div>

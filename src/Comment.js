@@ -26,7 +26,7 @@ class Comment extends Component{
                 <div style={{marginLeft:1000,position:'absolute',marginTop:20}}>
                     <button onClick={()=>this.props.dispatch({type:"EDIT_COMMENT",id:this.props.comment.id})}>Edit</button>
                     <button onClick={()=>this.props.dispatch({type:"DELETE_COMMENT",id:this.props.comment.id})}>Delete</button>
-                    <button onClick={()=>{this.showAllData()}}>Show ID</button>
+                    {/* <button onClick={()=>{this.showAllData()}}>Show ID</button> */}
                 </div>
 
             </div>
